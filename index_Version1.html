@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      body {
+        font-family: "Baloo 2", cursive;
+        overflow: hidden;
+      }
+
+      /* --- Animated Galaxy Background --- */
+      @keyframes galaxyMotion {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+      .galaxy-bg {
+        background: linear-gradient(-45deg, #050017, #0f0a3c, #301a78, #000000);
+        background-size: 400% 400%;
+        animation: galaxyMotion 20s ease infinite;
+      }
+
+      /* --- Smooth Stage Transitions --- */
+      .stage-card {
+        display: none;
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+        transition: all 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .stage-card.visible {
+        display: block;
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      .stage-card.hiding {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.92);
+      }
+
+      /* --- Improved Particles --- */
+      .particle {
+        position: absolute;
+        color: #fff9c4;
+        font-size: 20px;
+        opacity: 0;
+        animation: float-up 18s linear infinite;
+        filter: drop-shadow(0 0 6px #ffe68a);
+      }
+      @keyframes float-up {
+        0% {
+          transform: translateY(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.9;
+        }
+        90% {
+          opacity: 0.9;
+        }
+        100% {
+          transform: translateY(-160vh);
+          opacity: 0;
+        }
+      }
+
+      /* --- Moon --- */
+      #moon {
+        position: absolute;
+        top: 3rem;
+        right: 3rem;
+        width: 6rem;
+        height: 6rem;
+        background-color: #ffffff;
+        border-radius: 9999px;
+        box-shadow: 0 0 50px 15px rgba(255, 255, 255, 0.55),
+          0 0 80px 25px rgba(180, 150, 255, 0.25);
+        opacity: 0;
+        transform: translateY(40px);
+        animation: moonFade 2s 0.4s forwards ease-out;
+        z-index: 3;
+      }
+      @keyframes moonFade {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .crater {
+        position: absolute;
+        background-color: #d1d5db;
+        border-radius: 9999px;
+        filter: blur(1px);
+      }
+
+      /* Emoji animations */
+      @keyframes wiggle {
+        0%,
+        100% {
+          transform: rotate(0) scale(1);
+        }
+        25% {
+          transform: rotate(-8deg) scale(1.08);
+        }
+        75% {
+          transform: rotate(8deg) scale(1.08);
+        }
+      }
+      .wiggle-1 {
+        animation: wiggle 1.6s infinite;
+      }
+      .wiggle-2 {
+        animation: wiggle 1.6s 0.6s infinite;
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+      }
+      .bounce-gift {
+        animation: bounce 1.2s infinite;
+      }
+    </style>
+
+    <title>Happy Birthday!</title>
+  </head>
+
+  <body
+    class="relative min-h-screen w-full flex items-center justify-center p-4 galaxy-bg"
+  >
+    <!-- Moon -->
+    <div id="moon">
+      <div
+        class="crater"
+        style="
+          top: 1.25rem;
+          left: 2rem;
+          width: 1rem;
+          height: 1rem;
+          opacity: 0.5;
+        "
+      ></div>
+      <div
+        class="crater"
+        style="
+          top: 3rem;
+          left: 1.25rem;
+          width: 1.5rem;
+          height: 1.5rem;
+          opacity: 0.4;
+        "
+      ></div>
+      <div
+        class="crater"
+        style="
+          top: 2rem;
+          right: 1.25rem;
+          width: 1.25rem;
+          height: 1.25rem;
+          opacity: 0.5;
+        "
+      ></div>
+    </div>
+
+    <!-- Stars -->
+    <div id="particle-container"></div>
+
+    <!-- App -->
+    <div id="app-container" class="relative z-10 w-full max-w-md">
+      <!-- STAGE 1: LOADING -->
+      <div
+        id="stage-loading"
+        class="stage-card visible p-6 bg-slate-900/60 backdrop-blur-lg rounded-3xl shadow-2xl shadow-purple-800/40 text-center"
+      >
+        <div class="flex justify-center space-x-2 text-4xl mb-4">
+          <div class="wiggle-1">❤️</div>
+          <div class="wiggle-2">💖</div>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-200">
+          Loading something special...
+        </h2>
+        <div class="flex justify-center space-x-3 text-3xl mt-4 text-pink-400">
+          <span>🎂</span>
+          <span>✨</span>
+          <span>🎁</span>
+          <span>❤️</span>
+        </div>
+      </div>
+
+      <!-- STAGE 2: COUNTDOWN -->
+      <div
+        id="stage-countdown"
+        class="stage-card p-6 bg-slate-900/60 backdrop-blur-lg rounded-3xl shadow-2xl shadow-purple-800/40 text-center"
+      >
+        <h2 class="to-name text-3xl font-bold text-pink-400 mb-6"></h2>
+        <div class="flex justify-around space-x-2 sm:space-x-4 mb-6">
+          <div
+            class="flex flex-col items-center justify-center bg-white/20 rounded-2xl w-16 h-20 sm:w-20 sm:h-24 shadow-md shadow-purple-500/30"
+          >
+            <span
+              id="countdown-days"
+              class="text-3xl sm:text-4xl font-bold text-pink-500"
+              >0</span
+            >
+            <span class="text-xs sm:text-sm text-gray-200">Days</span>
+          </div>
+
+          <div
+            class="flex flex-col items-center justify-center bg-white/20 rounded-2xl w-16 h-20 sm:w-20 sm:h-24 shadow-md shadow-purple-500/30"
+          >
+            <span
+              id="countdown-hours"
+              class="text-3xl sm:text-4xl font-bold text-pink-500"
+              >0</span
+            >
+            <span class="text-xs sm:text-sm text-gray-200">Hours</span>
+          </div>
+
+          <div
+            class="flex flex-col items-center justify-center bg-white/20 rounded-2xl w-16 h-20 sm:w-20 sm:h-24 shadow-md shadow-purple-500/30"
+          >
+            <span
+              id="countdown-minutes"
+              class="text-3xl sm:text-4xl font-bold text-pink-500"
+              >0</span
+            >
+            <span class="text-xs sm:text-sm text-gray-200">Minutes</span>
+          </div>
+
+          <div
+            class="flex flex-col items-center justify-center bg-white/20 rounded-2xl w-16 h-20 sm:w-20 sm:h-24 shadow-md shadow-purple-500/30"
+          >
+            <span
+              id="countdown-seconds"
+              class="text-3xl sm:text-4xl font-bold text-pink-500"
+              >0</span
+            >
+            <span class="text-xs sm:text-sm text-gray-200">Seconds</span>
+          </div>
+        </div>
+        <div
+          class="bg-purple-300/10 p-3 rounded-lg border border-purple-400/20"
+        >
+          <p class="text-gray-200 font-medium">
+            Just a little more... A small gift for my friend ❤️
+          </p>
+        </div>
+      </div>
+
+      <!-- STAGE 3: PRESENT -->
+      <div
+        id="stage-present"
+        class="stage-card p-6 bg-slate-900/60 backdrop-blur-lg rounded-3xl shadow-2xl shadow-purple-800/40 text-center"
+      >
+        <h1
+          class="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-pink-400 mb-2"
+        >
+          Happy Birthday!
+        </h1>
+        <div class="text-4xl mb-4">🎂✨💖</div>
+        <h2 class="to-name text-2xl font-bold text-gray-200 mb-8">
+          To My my friend 
+        </h2>
+
+        <button
+          id="present-button"
+          class="w-full p-10 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 text-white shadow-xl transform transition-transform hover:scale-105 hover:-translate-y-1 active:scale-95"
+        >
+          <div class="bounce-gift text-7xl mb-4">🎁</div>
+          <span class="text-2xl font-bold">Tap to open your card</span>
+        </button>
+
+        
+        <p class="text-gray-400 text-sm mt-2">
+          Let's always stay like this... , forever ✨
+        </p>
+      </div>
+
+      <!-- STAGE 4: CARD -->
+      <div
+        id="stage-card"
+        class="stage-card p-6 bg-slate-900/60 backdrop-blur-lg rounded-3xl shadow-2xl shadow-purple-800/40 text-center"
+      >
+        <h1
+          class="to-name-card text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-fuchsia-400 to-pink-400 mb-2"
+        >
+          Happy Birthday! boss
+        </h1>
+
+        <div class="text-4xl mb-4">🎂✨💖</div>
+
+        <div class="text-left space-y-4 text-gray-200">
+          <p class="from-msg italic text-lg">""</p>
+          <p>
+            I hope your birthday is full of love, magic, and everything that
+            makes you smile ❤️
+          </p>
+          <p>
+             You deserve the world, and
+            I'll always be here to remind you of that.
+          </p>
+          <p class="from-name font-bold text-center mt-6 text-xl text-pink-300">
+            From,
+          </p>
+        </div>
+
+        <button
+          id="replay-button"
+          class="mt-8 px-6 py-2 rounded-full bg-white/20 hover:bg-white/30 text-xs text-gray-300 hover:text-white transition-colors uppercase tracking-widest"
+        >
+          Replay
+        </button>
+      </div>
+    </div>
+
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1/dist/confetti.browser.min.js"></script>
+
+    <!-- YOUR ORIGINAL JS LOGIC (UNMODIFIED) -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        let currentStage = "loading";
+        let countdownInterval;
+        let confettiInterval;
+        let params = {
+          to: "boss",
+          from: "Your Best Friend",
+          msg: "Just wanted to remind you—you're my favorite person. My days are better, smiles are wider, and life is sweeter because of you.",
+        };
+        const COUNTDOWN_TARGET_DATE = new Date(Date.now() + 10000);
+
+        const stageLoading = document.getElementById("stage-loading");
+        const stageCountdown = document.getElementById("stage-countdown");
+        const stagePresent = document.getElementById("stage-present");
+        const stageCard = document.getElementById("stage-card");
+        const particleContainer = document.getElementById("particle-container");
+
+        const countdownElements = {
+          days: document.getElementById("countdown-days"),
+          hours: document.getElementById("countdown-hours"),
+          minutes: document.getElementById("countdown-minutes"),
+          seconds: document.getElementById("countdown-seconds"),
+        };
+
+        const presentButton = document.getElementById("present-button");
+        const replayButton = document.getElementById("replay-button");
+
+        function setStage(newStage) {
+          const oldStageEl = document.getElementById(`stage-${currentStage}`);
+          const newStageEl = document.getElementById(`stage-${newStage}`);
+
+          if (oldStageEl) {
+            oldStageEl.classList.add("hiding");
+            oldStageEl.classList.remove("visible");
+
+            setTimeout(() => {
+              oldStageEl.style.display = "none";
+              oldStageEl.classList.remove("hiding");
+            }, 500);
+          }
+
+          if (newStageEl) {
+            newStageEl.style.display = "block";
+            setTimeout(() => newStageEl.classList.add("visible"), 20);
+          }
+
+          currentStage = newStage;
+
+          if (newStage === "countdown") startCountdown();
+          if (newStage === "card") startConfettiLoop();
+        }
+
+        function parseURLParams() {
+          const searchParams = new URLSearchParams(window.location.search);
+          const to = searchParams.get("to");
+          const from = searchParams.get("from");
+          const msg = searchParams.get("msg");
+
+          params.to = to || params.to;
+          params.from = from || params.from;
+          params.msg = msg || params.msg;
+
+          document.querySelectorAll(".to-name").forEach((el) => {
+            el.textContent = `${params.to}'s Special Day is Almost Here ❤️`;
+          });
+          document
+            .querySelectorAll(".to-name-card")
+            .forEach(
+              (el) => (el.textContent = `Happy Birthday, ${params.to}!`)
+            );
+          document
+            .querySelectorAll(".from-name")
+            .forEach((el) => (el.textContent = `From, ${params.from}`));
+          document
+            .querySelectorAll(".from-msg")
+            .forEach((el) => (el.textContent = `"${params.msg}"`));
+        }
+
+        function createParticles() {
+          for (let i = 0; i < 30; i++) {
+            const particle = document.createElement("div");
+            particle.className = "particle";
+            particle.textContent = ["✨", "⭐", "🌟"][
+              Math.floor(Math.random() * 3)
+            ];
+
+            const size = Math.random() * 0.5 + 0.5;
+            const duration = Math.random() * 15 + 10;
+            const delay = Math.random() * 5;
+
+            particle.style.left = `${Math.random() * 100}vw`;
+            particle.style.top = `${Math.random() * 100}vh`;
+            particle.style.fontSize = `${size * 24}px`;
+            particle.style.opacity = (size * 0.8).toString();
+            particle.style.animationDuration = `${duration}s`;
+            particle.style.animationDelay = `${delay}s`;
+
+            particle.style.filter = "drop-shadow(0 0 8px #ffe9ac)";
+
+            particleContainer.appendChild(particle);
+          }
+        }
+
+        function startCountdown() {
+          if (countdownInterval) clearInterval(countdownInterval);
+
+          countdownInterval = setInterval(() => {
+            const total =
+              COUNTDOWN_TARGET_DATE.getTime() - new Date().getTime();
+
+            if (total <= 0) {
+              clearInterval(countdownInterval);
+              setStage("present");
+            } else {
+              countdownElements.seconds.textContent = Math.floor(
+                (total / 1000) % 60
+              );
+              countdownElements.minutes.textContent = Math.floor(
+                (total / 1000 / 60) % 60
+              );
+              countdownElements.hours.textContent = Math.floor(
+                (total / (1000 * 60 * 60)) % 24
+              );
+              countdownElements.days.textContent = Math.floor(
+                total / (1000 * 60 * 60 * 24)
+              );
+            }
+          }, 1000);
+        }
+
+        function startConfettiLoop() {
+          if (confettiInterval) clearInterval(confettiInterval);
+
+          const fire = () => {
+            confetti({
+              angle: Math.random() * 60 + 90,
+              spread: Math.random() * 60 + 50,
+              particleCount: Math.random() * 40 + 30,
+              origin: { x: Math.random(), y: Math.random() - 0.2 },
+              colors: [
+                "#ffc0cb",
+                "#ff69b4",
+                "#dda0dd",
+                "#ba55d3",
+                "#87ceeb",
+                "#add8e6",
+              ],
+              disableForReducedMotion: true,
+            });
+          };
+
+          confettiInterval = setInterval(fire, 1000);
+        }
+
+        function stopConfettiLoop() {
+          if (confettiInterval) clearInterval(confettiInterval);
+        }
+
+        function resetApp() {
+          stopConfettiLoop();
+          if (countdownInterval) clearInterval(countdownInterval);
+
+          COUNTDOWN_TARGET_DATE.setTime(Date.now() + 10000);
+
+          setStage("loading");
+
+          setTimeout(() => {
+            setStage("countdown");
+          }, 2000);
+        }
+
+        createParticles();
+        parseURLParams();
+
+        presentButton.addEventListener("click", () => setStage("card"));
+        replayButton.addEventListener("click", resetApp);
+
+        setTimeout(() => {
+          setStage("countdown");
+        }, 2000);
+      });
+    </script>
+  </body>
+</html>
